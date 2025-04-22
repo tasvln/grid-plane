@@ -4,19 +4,34 @@
 #include <fstream>
 #include <sstream>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "lib/camera/camera.h"
+
 using namespace std;
 
 const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 768;
+
+float pVertices[] = {
+    -1000.0f, 0.0f, -1000.0f,
+    1000.0f, 0.0f, -1000.0f,
+    1000.0f, 0.0f, 1000.0f,
+    -1000.0f, 0.0f, 1000.0f};
+
+unsigned int pIndices[] = {
+    0, 1, 2,
+    0, 2, 3};
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 static SDL_GLContext context;
 
 // Open GL vars
-GLuint shaderProgram = 0;
-GLuint VAO = 0;
-GLuint VBO = 0;
-GLuint EBO = 0;
+GLuint shaderProgram, VAO, VBO, EBO;
+
+Camera cam(glm::vec3(0.0f, 1.0f, 5.0f));
 
 void close();

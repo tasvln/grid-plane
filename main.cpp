@@ -142,10 +142,22 @@ bool initGL()
   loadShader("lib/shaders/vertex.glsl", "lib/shaders/frag.glsl");
 
   glGenVertexArrays(1, &VAO);
+  glGenBuffers(1, &VBO);
+  glGenBuffers(1, &EBO);
+
   glBindVertexArray(VAO);
 
-  glGenBuffers(1, &VBO);
+  // vertex buffer
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(pVertices), pVertices, GL_STATIC_DRAW);
+
+  // element buffer
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(pIndices), pIndices, GL_STATIC_DRAW);
+
+  // TO DO: fully understand how this works
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
 
   glBindVertexArray(0);
 
@@ -164,9 +176,26 @@ void handleKeys(unsigned char key)
 
 void render()
 {
-  glClear(GL_COLOR_BUFFER_BIT);
+  glUseProgram(shaderProgram);
 
-  SDL_GL_SwapWindow(window);
+  glm::mat4 model = glm::mat4(1.0f);
+  glm::mat4 view = cam.GetViewMatrix();
+  glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
+
+  GLuint modelLoc = glGetUniformLocation(shaderProgram, "model");
+  GLuint viewLoc = glGetUniformLocation(shaderProgram, "view");
+  GLuint projLoc = glGetUniformLocation(shaderProgram, "projection");
+
+  glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+  glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+  glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+  glUniform1f(glGetUniformLocation(shaderProgram, "spacing"), 1.0f);
+  glUniform1f(glGetUniformLocation(shaderProgram, "line"), 0.03f);
+
+  glBindVertexArray(VAO);
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  glBindVertexArray(0);
 }
 
 int main(int argc, char *argv[])
@@ -196,7 +225,12 @@ int main(int argc, char *argv[])
       }
     }
 
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     render();
+
+    SDL_GL_SwapWindow(window);
   }
 
   close();
