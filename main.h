@@ -32,6 +32,11 @@ static SDL_GLContext context;
 // Open GL vars
 GLuint shaderProgram, VAO, VBO, EBO;
 
-Camera cam(glm::vec3(0.0f, 1.0f, 5.0f));
+Camera cam(
+    glm::vec3(0.0f, 5.0f, 5.0f),
+    glm::vec3(0.0f, 1.0f, 0.0f),
+    -45.0f, // Yaw
+    -35.0f  // Pitch
+);
 
 void close();

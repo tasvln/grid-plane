@@ -20,13 +20,13 @@ void main()
   // Calculate minimum distance to a grid line
   float line = min(grid.x, grid.y);
 
-  float thickness = 0.001; // desired thickness
+  float thickness = 0.002; // desired thickness
   float aa = fwidth(line) * 1.5; // anti-alias amount
 
   float gridFade = smoothstep(thickness + aa, thickness - aa, line);
 
   vec3 gridColor = vec3(0.1); // squares
-  vec3 backgroundColor = vec3(0.3); // lines
+  vec3 backgroundColor = vec3(0.5); // lines
 
   vec3 finalColor = mix(gridColor, backgroundColor, gridFade);
 
