@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+// TODO: split camera's -> Orbit Camera & FPS Camera & TPS Camera
+
 enum Camera_Movement
 {
   UP,
@@ -17,18 +19,24 @@ enum Camera_Movement
 class Camera
 {
 public:
-  // Camera attributes
+  // Basic Camera Attributes
   glm::vec3 Position;
   glm::vec3 Front;
   glm::vec3 Up;
   glm::vec3 Right;
   glm::vec3 WorldUp;
 
+  // Orbit Attributes
+  glm::vec3 Target;
+
   // Euler Angles
   float Yaw;
   float Pitch;
 
-  // Camera options
+  // Orbit Attributes
+  float Radius;
+
+  // Basic Camera Options
   float MovementSpeed;
   float MouseSensitivity;
   float Zoom;
