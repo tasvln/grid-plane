@@ -23,7 +23,7 @@ float pVertices[] = {
 
 unsigned int pIndices[] = {
     0, 1, 2,
-    0, 2, 3};
+    2, 3, 0};
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;

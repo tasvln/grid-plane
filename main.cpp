@@ -169,9 +169,20 @@ void update()
   // FPS Update logic
 }
 
-void handleKeys(unsigned char key)
+void handleKeys(SDL_Scancode key, float deltaTime)
 {
-  // Keys Logic
+  if (key == SDL_SCANCODE_W)
+    cam.ProcessKeyboard(FORWARD, deltaTime);
+  if (key == SDL_SCANCODE_S)
+    cam.ProcessKeyboard(BACKWARD, deltaTime);
+  if (key == SDL_SCANCODE_A)
+    cam.ProcessKeyboard(LEFT, deltaTime);
+  if (key == SDL_SCANCODE_D)
+    cam.ProcessKeyboard(RIGHT, deltaTime);
+  if (key == SDL_SCANCODE_Q)
+    cam.ProcessKeyboard(UP, deltaTime);
+  if (key == SDL_SCANCODE_E)
+    cam.ProcessKeyboard(DOWN, deltaTime);
 }
 
 void render()
@@ -190,8 +201,7 @@ void render()
   glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
   glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-  glUniform1f(glGetUniformLocation(shaderProgram, "spacing"), 1.0f);
-  glUniform1f(glGetUniformLocation(shaderProgram, "line"), 0.03f);
+  glUniform1f(glGetUniformLocation(shaderProgram, "spacing"), 5.0f);
 
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -200,6 +210,9 @@ void render()
 
 int main(int argc, char *argv[])
 {
+  float deltaTime = 0.0f;
+  float lastFrame = 0.0f;
+
   if (!init())
   {
     cerr << "Failed to initialize" << endl;
@@ -212,16 +225,28 @@ int main(int argc, char *argv[])
     return -1;
   }
 
-  SDL_Event evt;
-  bool running = false;
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDisable(GL_DEPTH_TEST);
 
-  while (!running)
+  SDL_Event evt;
+  bool running = true;
+
+  while (running)
   {
+    float currentFrame = SDL_GetTicks() / 1000.0f;
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+
     while (SDL_PollEvent(&evt))
     {
       if (evt.type == SDL_EVENT_QUIT)
       {
-        running = true;
+        running = false;
+      }
+      if (evt.type == SDL_EVENT_KEY_DOWN)
+      {
+        handleKeys(evt.key.scancode, deltaTime);
       }
     }
 

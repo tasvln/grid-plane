@@ -3,20 +3,32 @@
 in vec3 worldPos;
 out vec4 FragColor;
 
-uniform float spacing = 1.0;
-uniform float line = 0.03;
-uniform vec3 gridColor = vec3(0.2, 0.6, 1.0);
-uniform vec3 bgColor = vec3(0.0, 0.0, 0.0);
+uniform vec3 cameraPosition;
+uniform float spacing;
 
 void main()
 {
-  // Compute distance to the nearest grid line in X and Z directions
-  float lineX = abs(fract(worldPos.x / spacing - 0.5) - 0.5);
-  float lineZ = abs(fract(worldPos.z / spacing - 0.5) - 0.5);
+  // screen-space line thickness
+  vec2 dx = vec2(dFdx(worldPos.x), dFdy(worldPos.x));
+  vec2 dy = vec2(dFdx(worldPos.z), dFdy(worldPos.z));
+  vec2 dudv = vec2(length(dx), length(dy));
 
-  // Blend line color based on the line Thickness
-  float blend = 1.0 - min(min(lineX, lineZ) / line, 1.0);
-  vec3 color = mix(bgColor, gridColor, blend);
+  // grid position
+  float scale = 2.0; // Increase to make lines visually thicker
+  vec2 grid = abs(fract(worldPos.xz / spacing * scale) - 0.5);
 
-  FragColor = vec4(color, 1.0);
+  // Calculate minimum distance to a grid line
+  float line = min(grid.x, grid.y);
+
+  float thickness = 0.001; // desired thickness
+  float aa = fwidth(line) * 1.5; // anti-alias amount
+
+  float gridFade = smoothstep(thickness + aa, thickness - aa, line);
+
+  vec3 gridColor = vec3(0.1); // squares
+  vec3 backgroundColor = vec3(0.3); // lines
+
+  vec3 finalColor = mix(gridColor, backgroundColor, gridFade);
+
+  FragColor = vec4(finalColor, 1.0);
 }

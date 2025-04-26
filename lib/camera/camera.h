@@ -6,6 +6,8 @@
 
 enum Camera_Movement
 {
+  UP,
+  DOWN,
   FORWARD,
   BACKWARD,
   LEFT,
@@ -36,7 +38,7 @@ public:
       glm::vec3 position = glm::vec3(0.0f, 0.0f, 3.0f),
       glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
       float yaw = -90.0f,
-      float pitch = 0.0f) : Front(glm::vec3(0.0f, 0.0f, -1.0f)),
+      float pitch = 0.0f) : Front(glm::vec3(0.0f, 0.0f, 1.0f)),
                             MovementSpeed(2.5f),
                             MouseSensitivity(0.1f),
                             Zoom(45.0f)
@@ -64,6 +66,10 @@ public:
       Position -= Right * velocity;
     if (direction == RIGHT)
       Position += Right * velocity;
+    if (direction == UP)
+      Position.y += velocity;
+    if (direction == DOWN)
+      Position.y -= velocity;
   }
 
   void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true)
