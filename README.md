@@ -23,7 +23,6 @@ A simple infinite grid plane built using **SDL3**, **OpenGL**, and **GLEW**, ins
 ### Project Structure
 ```
 /lib           -> Source (.cpp) and header (.h) files
-/WINDOW        -> Window management and OpenGL context setup
 build.sh       -> Build script
 main.cpp       -> Entry point
 main.h         -> Main header
