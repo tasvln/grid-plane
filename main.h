@@ -8,7 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "lib/camera/camera.h"
+#include "lib/camera/orbit.h"
 
 using namespace std;
 
@@ -32,11 +32,11 @@ static SDL_GLContext context;
 // Open GL vars
 GLuint shaderProgram, VAO, VBO, EBO;
 
-Camera cam(
-    glm::vec3(0.0f, 5.0f, 5.0f),
-    glm::vec3(0.0f, 1.0f, 0.0f),
-    -45.0f, // Yaw
-    -35.0f  // Pitch
+OrbitCamera orbitCam(
+    glm::vec3(0.0f), // Target is origin
+    15.0f,           // Radius distance from target
+    -45.0f,          // Yaw
+    20.0f            // Pitch
 );
 
 void close();

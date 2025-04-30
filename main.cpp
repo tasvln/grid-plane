@@ -171,18 +171,6 @@ void update()
 
 void handleKeys(SDL_Scancode key, float deltaTime)
 {
-  if (key == SDL_SCANCODE_W)
-    cam.ProcessKeyboard(FORWARD, deltaTime);
-  if (key == SDL_SCANCODE_S)
-    cam.ProcessKeyboard(BACKWARD, deltaTime);
-  if (key == SDL_SCANCODE_A)
-    cam.ProcessKeyboard(LEFT, deltaTime);
-  if (key == SDL_SCANCODE_D)
-    cam.ProcessKeyboard(RIGHT, deltaTime);
-  if (key == SDL_SCANCODE_Q)
-    cam.ProcessKeyboard(UP, deltaTime);
-  if (key == SDL_SCANCODE_E)
-    cam.ProcessKeyboard(DOWN, deltaTime);
 }
 
 void render()
@@ -190,7 +178,7 @@ void render()
   glUseProgram(shaderProgram);
 
   glm::mat4 model = glm::mat4(1.0f);
-  glm::mat4 view = cam.GetViewMatrix();
+  glm::mat4 view = orbitCam.getViewMatrix();
   glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
 
   GLuint modelLoc = glGetUniformLocation(shaderProgram, "model");
@@ -206,6 +194,55 @@ void render()
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
+}
+
+void handleOrbitMouseMovement(SDL_Event event)
+{
+  static int lastX = SCREEN_WIDTH / 2;
+  static int lastY = SCREEN_HEIGHT / 2;
+  static bool rotating = false;
+  static bool firstMouse = true;
+
+  switch (event.type)
+  {
+  case SDL_EVENT_MOUSE_BUTTON_DOWN:
+    if (event.button.button == SDL_BUTTON_RIGHT) // Right click (two-finger click on Mac)
+    {
+      rotating = true;
+      firstMouse = true; // reset to avoid jump
+    }
+    break;
+
+  case SDL_EVENT_MOUSE_BUTTON_UP:
+    if (event.button.button == SDL_BUTTON_RIGHT)
+    {
+      rotating = false;
+    }
+    break;
+
+  case SDL_EVENT_MOUSE_MOTION:
+    if (rotating)
+    {
+      int xpos = event.motion.x;
+      int ypos = event.motion.y;
+
+      if (firstMouse)
+      {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+      }
+
+      float xoffset = xpos - lastX;
+      float yoffset = lastY - ypos; // reversed since y-coordinates go from top to bottom
+
+      lastX = xpos;
+      lastY = ypos;
+
+      orbitCam.processMouseMovement(xoffset, yoffset);
+    }
+    break;
+  }
 }
 
 int main(int argc, char *argv[])
@@ -226,11 +263,13 @@ int main(int argc, char *argv[])
   }
 
   glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glDisable(GL_DEPTH_TEST);
+  glEnable(GL_DEPTH_TEST);
 
   SDL_Event evt;
   bool running = true;
+
+  int lastX = SCREEN_WIDTH / 2, lastY = SCREEN_HEIGHT / 2;
+  bool firstMouse = true;
 
   while (running)
   {
@@ -248,6 +287,7 @@ int main(int argc, char *argv[])
       {
         handleKeys(evt.key.scancode, deltaTime);
       }
+      handleOrbitMouseMovement(evt);
     }
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
