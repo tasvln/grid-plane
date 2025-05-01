@@ -200,48 +200,34 @@ void handleOrbitMouseMovement(SDL_Event event)
 {
   static int lastX = SCREEN_WIDTH / 2;
   static int lastY = SCREEN_HEIGHT / 2;
-  static bool rotating = false;
   static bool firstMouse = true;
 
-  switch (event.type)
+  if (event.type == SDL_EVENT_MOUSE_MOTION)
   {
-  case SDL_EVENT_MOUSE_BUTTON_DOWN:
-    if (event.button.button == SDL_BUTTON_RIGHT) // Right click (two-finger click on Mac)
+    SDL_Keymod mod = SDL_GetModState();
+    bool ctrlDown = (mod & SDL_KMOD_CTRL);
+    bool cmdDown = (mod & SDL_KMOD_GUI); // Command key on macOS
+
+    if (!(ctrlDown || cmdDown))
+      return; // Skip orbiting unless Ctrl or Command is held
+
+    int xpos = event.motion.x;
+    int ypos = event.motion.y;
+
+    if (firstMouse)
     {
-      rotating = true;
-      firstMouse = true; // reset to avoid jump
-    }
-    break;
-
-  case SDL_EVENT_MOUSE_BUTTON_UP:
-    if (event.button.button == SDL_BUTTON_RIGHT)
-    {
-      rotating = false;
-    }
-    break;
-
-  case SDL_EVENT_MOUSE_MOTION:
-    if (rotating)
-    {
-      int xpos = event.motion.x;
-      int ypos = event.motion.y;
-
-      if (firstMouse)
-      {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-      }
-
-      float xoffset = xpos - lastX;
-      float yoffset = lastY - ypos; // reversed since y-coordinates go from top to bottom
-
       lastX = xpos;
       lastY = ypos;
-
-      orbitCam.processMouseMovement(xoffset, yoffset);
+      firstMouse = false;
     }
-    break;
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from top to bottom
+
+    lastX = xpos;
+    lastY = ypos;
+
+    orbitCam.processMouseMovement(xoffset, yoffset);
   }
 }
 
@@ -249,6 +235,8 @@ int main(int argc, char *argv[])
 {
   float deltaTime = 0.0f;
   float lastFrame = 0.0f;
+
+  SDL_SetHint(SDL_HINT_TRACKPAD_IS_TOUCH_ONLY, "1");
 
   if (!init())
   {
