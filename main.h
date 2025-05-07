@@ -30,7 +30,9 @@ static SDL_Renderer *renderer = NULL;
 static SDL_GLContext context;
 
 // Open GL vars
-GLuint shaderProgram, VAO, VBO, EBO;
+GLuint gridShaderProgram, originDotShaderProgram;
+GLuint gridVAO, gridVBO, gridEBO;
+GLuint dotVAO, dotVBO;
 
 OrbitCamera orbitCam(
     glm::vec3(0.0f), // Target is origin
