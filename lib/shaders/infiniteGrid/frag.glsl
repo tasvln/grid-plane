@@ -14,21 +14,42 @@ void main()
   vec2 dudv = vec2(length(dx), length(dy));
 
   // grid position
-  float scale = 2.0; // Increase to make lines visually thicker
-  vec2 grid = abs(fract(worldPos.xz / spacing * scale) - 0.5);
+  float scale = 2.0;
+  vec2 grid = abs(fract(worldPos.xz / spacing * scale));
 
-  // Calculate minimum distance to a grid line
   float line = min(grid.x, grid.y);
+  float thickness = 0.002;
+  float aa = fwidth(line) * 1.5;
 
-  float thickness = 0.002; // desired thickness
-  float aa = fwidth(line) * 1.5; // anti-alias amount
+  // Axis lines (X in red, Z in blue)
+
+  // thickness for Y axis line
+  bool isXAxis = abs(worldPos.z) < spacing * thickness;
+  // thickness for Z axis line
+  bool isZAxis = abs(worldPos.x) < spacing * thickness;
+
+  float dist = length(worldPos.xz - cameraPosition.xz);
+
+  // fade range
+  float fade = 1.0 - smoothstep(20.0, 80.0, dist);
+
+  if (isXAxis) {
+    FragColor = vec4(vec3(1.0, 0.0, 0.0), fade);
+    return;
+  }
+  if (isZAxis) {
+    FragColor = vec4(vec3(0.0, 0.0, 1.0), fade);
+    return;
+  }
 
   float gridFade = smoothstep(thickness + aa, thickness - aa, line);
 
-  vec3 gridColor = vec3(0.1); // squares
-  vec3 backgroundColor = vec3(0.5); // lines
+  // grid lines color
+  vec3 gridColor = vec3(0.1);
+  // between lines color
+  vec3 backgroundColor = vec3(0.5);
 
   vec3 finalColor = mix(gridColor, backgroundColor, gridFade);
 
-  FragColor = vec4(finalColor, 1.0);
+  FragColor = vec4(finalColor, fade);
 }

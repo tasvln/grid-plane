@@ -179,7 +179,7 @@ bool drawOriginDot()
   originDotShaderProgram = loadShader("lib/shaders/centerAnchor/vertex.glsl", "lib/shaders/centerAnchor/frag.glsl");
 
   float dotVertices[] = {
-      0.0f, 0.0f};
+      0.0f, 0.0f, 0.0f};
 
   glGenVertexArrays(1, &dotVAO);
   glGenBuffers(1, &dotVBO);
@@ -189,7 +189,7 @@ bool drawOriginDot()
   glBindBuffer(GL_ARRAY_BUFFER, dotVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(dotVertices), dotVertices, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -209,7 +209,8 @@ void handleKeys(SDL_Scancode key, float deltaTime)
 
 void render()
 {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Don't forget this
+  glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glm::mat4 model = glm::mat4(1.0f);
   glm::mat4 view = orbitCam.getViewMatrix();
@@ -224,7 +225,7 @@ void render()
   glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
   glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
   glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-  glUniform1f(glGetUniformLocation(gridShaderProgram, "spacing"), 5.0f);
+  glUniform1f(glGetUniformLocation(gridShaderProgram, "spacing"), 10.0f);
 
   glBindVertexArray(gridVAO);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
