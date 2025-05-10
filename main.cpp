@@ -209,7 +209,7 @@ void handleKeys(SDL_Scancode key, float deltaTime)
 
 void render()
 {
-  glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glm::mat4 model = glm::mat4(1.0f);
@@ -232,18 +232,18 @@ void render()
   glBindVertexArray(0);
 
   // Draw Origin Dot
-  glUseProgram(originDotShaderProgram);
-  modelLoc = glGetUniformLocation(originDotShaderProgram, "model");
-  viewLoc = glGetUniformLocation(originDotShaderProgram, "view");
-  projLoc = glGetUniformLocation(originDotShaderProgram, "projection");
+  // glUseProgram(originDotShaderProgram);
+  // modelLoc = glGetUniformLocation(originDotShaderProgram, "model");
+  // viewLoc = glGetUniformLocation(originDotShaderProgram, "view");
+  // projLoc = glGetUniformLocation(originDotShaderProgram, "projection");
 
-  glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-  glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-  glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+  // glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+  // glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+  // glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-  glPointSize(8.0f);
-  glBindVertexArray(dotVAO);
-  glDrawArrays(GL_POINTS, 0, 1);
+  // glPointSize(8.0f);
+  // glBindVertexArray(dotVAO);
+  // glDrawArrays(GL_POINTS, 0, 1);
   glBindVertexArray(0);
 }
 
