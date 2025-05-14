@@ -205,6 +205,17 @@ void update()
 
 void handleKeys(SDL_Scancode key, float deltaTime)
 {
+  // GLuint num;
+  const bool *keystates = SDL_GetKeyboardState(NULL);
+
+  if (keystates[SDL_SCANCODE_W])
+    fpsCam.processKeyboard("FORWARD", deltaTime);
+  if (keystates[SDL_SCANCODE_S])
+    fpsCam.processKeyboard("BACKWARD", deltaTime);
+  if (keystates[SDL_SCANCODE_A])
+    fpsCam.processKeyboard("LEFT", deltaTime);
+  if (keystates[SDL_SCANCODE_D])
+    fpsCam.processKeyboard("RIGHT", deltaTime);
 }
 
 void render()
@@ -213,7 +224,8 @@ void render()
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glm::mat4 model = glm::mat4(1.0f);
-  glm::mat4 view = orbitCam.getViewMatrix();
+  // glm::mat4 view = orbitCam.getViewMatrix();
+  glm::mat4 view = fpsCam.getViewMatrix();
   glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
 
   // Draw Grid
@@ -229,21 +241,6 @@ void render()
 
   glBindVertexArray(gridVAO);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-  glBindVertexArray(0);
-
-  // Draw Origin Dot
-  // glUseProgram(originDotShaderProgram);
-  // modelLoc = glGetUniformLocation(originDotShaderProgram, "model");
-  // viewLoc = glGetUniformLocation(originDotShaderProgram, "view");
-  // projLoc = glGetUniformLocation(originDotShaderProgram, "projection");
-
-  // glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-  // glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-  // glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-  // glPointSize(8.0f);
-  // glBindVertexArray(dotVAO);
-  // glDrawArrays(GL_POINTS, 0, 1);
   glBindVertexArray(0);
 }
 
@@ -303,12 +300,24 @@ void handleOrbitZoomKeys(SDL_Event event)
   }
 }
 
+void handleFPSMovement(SDL_Event event)
+{
+  if (event.type == SDL_EVENT_MOUSE_MOTION)
+  {
+    float xoffset = event.motion.xrel;
+    float yoffset = -event.motion.yrel; // Invert y for typical FPS
+    fpsCam.processMouseMovement(xoffset, yoffset);
+  }
+}
+
 int main(int argc, char *argv[])
 {
   float deltaTime = 0.0f;
   float lastFrame = 0.0f;
 
   SDL_SetHint(SDL_HINT_TRACKPAD_IS_TOUCH_ONLY, "1");
+  SDL_SetWindowRelativeMouseMode(window, true);
+  SDL_PumpEvents();
 
   if (!init())
   {
@@ -356,6 +365,7 @@ int main(int argc, char *argv[])
       }
       handleOrbitMouseMovement(evt);
       handleOrbitZoomKeys(evt);
+      handleFPSMovement(evt);
     }
 
     render();

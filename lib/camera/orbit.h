@@ -5,17 +5,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 // TODO: split camera's -> Orbit Camera & FPS Camera & TPS Camera
-
-enum Camera_Movement
-{
-  UP,
-  DOWN,
-  FORWARD,
-  BACKWARD,
-  LEFT,
-  RIGHT
-};
-
 class OrbitCamera
 {
 public:
@@ -56,7 +45,7 @@ public:
     WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
     MouseSensitivity = 0.1f;
     Zoom = 45.0f;
-    MovementSpeed = 5.0f;
+    MovementSpeed = 10.0f;
 
     // Will calculate Position from Target, Yaw, Pitch, and Radius
     updateCameraVectors();

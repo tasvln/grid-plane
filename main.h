@@ -9,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "lib/camera/orbit.h"
+#include "lib/camera/fps.h"
 
 using namespace std;
 
@@ -40,5 +41,7 @@ OrbitCamera orbitCam(
     -45.0f,          // Yaw
     20.0f            // Pitch
 );
+
+FPSCamera fpsCam(glm::vec3(0.0f, 1.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
 
 void close();
