@@ -205,13 +205,6 @@ void update()
 
 void handleOrbitMouseMovement(SDL_Event event)
 {
-  SDL_Keymod mod = SDL_GetModState();
-  bool ctrlDown = (mod & SDL_KMOD_CTRL);
-  bool cmdDown = (mod & SDL_KMOD_GUI);
-
-  if (!(ctrlDown || cmdDown))
-    return;
-
   if (event.type == SDL_EVENT_MOUSE_MOTION)
   {
     // relative motion
@@ -223,24 +216,11 @@ void handleOrbitMouseMovement(SDL_Event event)
   }
 }
 
-void handleOrbitZoomKeys(SDL_Event event)
+void handleOrbitZoom(SDL_Event event)
 {
-  if (event.type == SDL_EVENT_KEY_DOWN)
+  if (event.type == SDL_EVENT_MOUSE_WHEEL)
   {
-    SDL_Keymod mod = SDL_GetModState();
-    bool shiftDown = (mod & SDL_KMOD_SHIFT);
-
-    if (shiftDown)
-    {
-      if (event.key.key == SDLK_EQUALS || event.key.key == SDLK_KP_PLUS)
-      {
-        orbitCam.processMouseScroll(0.5f); // Zoom in
-      }
-      else if (event.key.key == SDLK_MINUS || event.key.key == SDLK_KP_MINUS)
-      {
-        orbitCam.processMouseScroll(-0.5f); // Zoom out
-      }
-    }
+    orbitCam.processMouseScroll(static_cast<float>(event.wheel.y));
   }
 }
 
@@ -355,9 +335,13 @@ int main(int argc, char *argv[])
       if (evt.type == SDL_EVENT_KEY_DOWN)
       {
         handleKeys(evt.key.scancode, deltaTime);
+        if (evt.key.scancode == SDLK_ESCAPE)
+        {
+          running = false;
+        }
       }
       handleOrbitMouseMovement(evt);
-      handleOrbitZoomKeys(evt);
+      handleOrbitZoom(evt);
       // handleFPSMouseMovement(evt);
     }
 
