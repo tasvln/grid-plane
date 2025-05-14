@@ -40,7 +40,6 @@ public:
   // Others
   bool isGrounded;
   bool isFlying;
-  bool isCrouching;
 
   const float gravity = -9.81f;
   const float jumpForce = 5.0f;
@@ -62,7 +61,6 @@ public:
     velocity = velocity;
     isGrounded = true;
     isFlying = false;
-    isCrouching = false;
 
     updateCameraVectors();
   }
@@ -78,20 +76,6 @@ public:
     {
       velocity.y = jumpForce;
       isGrounded = false;
-    }
-  }
-
-  void toggleCrouch()
-  {
-    if (!isCrouching)
-    {
-      position.y -= crouchOffset;
-      isCrouching = true;
-    }
-    else
-    {
-      position.y += crouchOffset;
-      isCrouching = false;
     }
   }
 

@@ -4,8 +4,8 @@ A simple infinite grid plane built using **SDL3**, **OpenGL**, and **GLEW**, ins
 
 ## Features
 - Infinite procedural grid rendering
-- FPS-style camera movement (WIP)
-- Orbit camera movement (WIP)
+- FPS-style camera movement
+- Orbit camera movement
 - Basic FPS counter
 - Lightweight and minimal dependencies
 
@@ -32,13 +32,13 @@ README.md      -> Project documentation
 ```
 
 ## Controls
-- **WASD** or **Arrow Keys** — Move camera (FPS movement)
-- **Right Mouse + Drag** — Orbit around point (WIP)
+- **WASD** — Move camera (FPS movement)
+- **Right Mouse + Drag** — Orbit around point
 - **Mouse Scroll** — Zoom in/out
 
 ### Build Instructions
 ```bash
-git clone https://github.com/yourusername/infinite-grid-plane.git
+git clone https://github.com/tasvln/infinite-grid-plane.git
 cd infinite-grid-plane
 ./build.sh
 ```

@@ -284,8 +284,6 @@ void handleKeys(SDL_Scancode key, float deltaTime)
     fpsCam.processKeyboard("RIGHT", deltaTime);
   if (keystates[SDL_SCANCODE_SPACE])
     fpsCam.jump();
-  if (keystates[SDL_SCANCODE_LCTRL])
-    fpsCam.toggleCrouch();
 }
 
 void render()
@@ -343,7 +341,6 @@ int main(int argc, char *argv[])
 
   glEnable(GL_BLEND);
   glEnable(GL_DEPTH_TEST);
-  // glDisable(GL_DEPTH_TEST);
 
   SDL_Event evt;
   bool running = true;
