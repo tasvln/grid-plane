@@ -318,6 +318,8 @@ int main(int argc, char *argv[])
   float lastFrame = 0.0f;
 
   SDL_SetHint(SDL_HINT_TRACKPAD_IS_TOUCH_ONLY, "1");
+
+  // SDL_SetWindowRelativeMouseMode(window, toggle ? SDL_TRUE : SDL_FALSE); -> for cam toggle implementation
   SDL_SetWindowRelativeMouseMode(window, true);
   SDL_PumpEvents();
 
