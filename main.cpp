@@ -205,34 +205,19 @@ void update()
 
 void handleOrbitMouseMovement(SDL_Event event)
 {
-  static int lastX = SCREEN_WIDTH / 2;
-  static int lastY = SCREEN_HEIGHT / 2;
-  static bool firstMouse = true;
+  SDL_Keymod mod = SDL_GetModState();
+  bool ctrlDown = (mod & SDL_KMOD_CTRL);
+  bool cmdDown = (mod & SDL_KMOD_GUI);
+
+  if (!(ctrlDown || cmdDown))
+    return;
 
   if (event.type == SDL_EVENT_MOUSE_MOTION)
   {
-    SDL_Keymod mod = SDL_GetModState();
-    bool ctrlDown = (mod & SDL_KMOD_CTRL);
-    bool cmdDown = (mod & SDL_KMOD_GUI); // Command key on macOS
-
-    if (!(ctrlDown || cmdDown))
-      return; // Skip orbiting unless Ctrl or Command is held
-
-    int xpos = event.motion.x;
-    int ypos = event.motion.y;
-
-    if (firstMouse)
-    {
-      lastX = xpos;
-      lastY = ypos;
-      firstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from top to bottom
-
-    lastX = xpos;
-    lastY = ypos;
+    // relative motion
+    float xoffset = event.motion.xrel;
+    // invert y for Blender-like feel
+    float yoffset = -event.motion.yrel;
 
     orbitCam.processMouseMovement(xoffset, yoffset);
   }
@@ -259,7 +244,7 @@ void handleOrbitZoomKeys(SDL_Event event)
   }
 }
 
-void handleFPSMovement(SDL_Event event)
+void handleFPSMouseMovement(SDL_Event event)
 {
   if (event.type == SDL_EVENT_MOUSE_MOTION)
   {
@@ -269,7 +254,7 @@ void handleFPSMovement(SDL_Event event)
   }
 }
 
-void handleKeys(SDL_Scancode key, float deltaTime)
+void handleFPSKeyMovement(SDL_Scancode key, float deltaTime)
 {
   // GLuint num;
   const bool *keystates = SDL_GetKeyboardState(NULL);
@@ -286,14 +271,19 @@ void handleKeys(SDL_Scancode key, float deltaTime)
     fpsCam.jump();
 }
 
+void handleKeys(SDL_Scancode key, float deltaTime)
+{
+  handleFPSKeyMovement(key, deltaTime);
+}
+
 void render()
 {
   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glm::mat4 model = glm::mat4(1.0f);
-  // glm::mat4 view = orbitCam.getViewMatrix();
-  glm::mat4 view = fpsCam.getViewMatrix();
+  glm::mat4 view = orbitCam.getViewMatrix();
+  // glm::mat4 view = fpsCam.getViewMatrix();
   glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
 
   // Draw Grid
@@ -319,7 +309,7 @@ int main(int argc, char *argv[])
 
   SDL_SetHint(SDL_HINT_TRACKPAD_IS_TOUCH_ONLY, "1");
 
-  // SDL_SetWindowRelativeMouseMode(window, toggle ? SDL_TRUE : SDL_FALSE); -> for cam toggle implementation
+  // SDL_SetWindowRelativeMouseMode(window, toggle ? SDL_TRUE : SDL_FALSE); -> for cam toggle implementation / keep relative true?
   SDL_SetWindowRelativeMouseMode(window, true);
   SDL_PumpEvents();
 
@@ -368,10 +358,10 @@ int main(int argc, char *argv[])
       }
       handleOrbitMouseMovement(evt);
       handleOrbitZoomKeys(evt);
-      handleFPSMovement(evt);
+      // handleFPSMouseMovement(evt);
     }
 
-    fpsCam.updatePhysics(deltaTime);
+    // fpsCam.updatePhysics(deltaTime);
 
     render();
 
