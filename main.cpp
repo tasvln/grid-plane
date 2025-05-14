@@ -203,47 +203,6 @@ void update()
   // FPS Update logic
 }
 
-void handleKeys(SDL_Scancode key, float deltaTime)
-{
-  // GLuint num;
-  const bool *keystates = SDL_GetKeyboardState(NULL);
-
-  if (keystates[SDL_SCANCODE_W])
-    fpsCam.processKeyboard("FORWARD", deltaTime);
-  if (keystates[SDL_SCANCODE_S])
-    fpsCam.processKeyboard("BACKWARD", deltaTime);
-  if (keystates[SDL_SCANCODE_A])
-    fpsCam.processKeyboard("LEFT", deltaTime);
-  if (keystates[SDL_SCANCODE_D])
-    fpsCam.processKeyboard("RIGHT", deltaTime);
-}
-
-void render()
-{
-  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  glm::mat4 model = glm::mat4(1.0f);
-  // glm::mat4 view = orbitCam.getViewMatrix();
-  glm::mat4 view = fpsCam.getViewMatrix();
-  glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
-
-  // Draw Grid
-  glUseProgram(gridShaderProgram);
-  GLuint modelLoc = glGetUniformLocation(gridShaderProgram, "model");
-  GLuint viewLoc = glGetUniformLocation(gridShaderProgram, "view");
-  GLuint projLoc = glGetUniformLocation(gridShaderProgram, "projection");
-
-  glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-  glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-  glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-  glUniform1f(glGetUniformLocation(gridShaderProgram, "spacing"), 10.0f);
-
-  glBindVertexArray(gridVAO);
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-  glBindVertexArray(0);
-}
-
 void handleOrbitMouseMovement(SDL_Event event)
 {
   static int lastX = SCREEN_WIDTH / 2;
@@ -310,6 +269,51 @@ void handleFPSMovement(SDL_Event event)
   }
 }
 
+void handleKeys(SDL_Scancode key, float deltaTime)
+{
+  // GLuint num;
+  const bool *keystates = SDL_GetKeyboardState(NULL);
+
+  if (keystates[SDL_SCANCODE_W])
+    fpsCam.processKeyboard("FORWARD", deltaTime);
+  if (keystates[SDL_SCANCODE_S])
+    fpsCam.processKeyboard("BACKWARD", deltaTime);
+  if (keystates[SDL_SCANCODE_A])
+    fpsCam.processKeyboard("LEFT", deltaTime);
+  if (keystates[SDL_SCANCODE_D])
+    fpsCam.processKeyboard("RIGHT", deltaTime);
+  if (keystates[SDL_SCANCODE_SPACE])
+    fpsCam.jump();
+  if (keystates[SDL_SCANCODE_LCTRL])
+    fpsCam.toggleCrouch();
+}
+
+void render()
+{
+  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  glm::mat4 model = glm::mat4(1.0f);
+  // glm::mat4 view = orbitCam.getViewMatrix();
+  glm::mat4 view = fpsCam.getViewMatrix();
+  glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
+
+  // Draw Grid
+  glUseProgram(gridShaderProgram);
+  GLuint modelLoc = glGetUniformLocation(gridShaderProgram, "model");
+  GLuint viewLoc = glGetUniformLocation(gridShaderProgram, "view");
+  GLuint projLoc = glGetUniformLocation(gridShaderProgram, "projection");
+
+  glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+  glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+  glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+  glUniform1f(glGetUniformLocation(gridShaderProgram, "spacing"), 10.0f);
+
+  glBindVertexArray(gridVAO);
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  glBindVertexArray(0);
+}
+
 int main(int argc, char *argv[])
 {
   float deltaTime = 0.0f;
@@ -367,6 +371,8 @@ int main(int argc, char *argv[])
       handleOrbitZoomKeys(evt);
       handleFPSMovement(evt);
     }
+
+    fpsCam.updatePhysics(deltaTime);
 
     render();
 

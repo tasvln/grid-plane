@@ -27,6 +27,8 @@ public:
   glm::vec3 right;
   glm::vec3 worldUp;
 
+  glm::vec3 velocity;
+
   // Euler Angles
   float yaw;
   float pitch;
@@ -35,44 +37,88 @@ public:
   float speed;
   float sensitivity;
 
+  // Others
+  bool isGrounded;
+  bool isFlying;
+  bool isCrouching;
+
+  const float gravity = -9.81f;
+  const float jumpForce = 5.0f;
+
+  const float standHeight = 1.0f;
+  const float crouchOffset = 0.2f;
+
   // Constructor with default values
-  FPSCamera(glm::vec3 startPosition, glm::vec3 upDirection, float startYaw, float startPitch)
+  FPSCamera(glm::vec3 startPosition, glm::vec3 upDirection, glm::vec3 velocity, float startYaw, float startPitch)
   {
     position = startPosition;
     worldUp = upDirection;
     yaw = startYaw;
     pitch = startPitch;
 
-    speed = 3.0f;
+    speed = 10.0f;
     sensitivity = 0.1f;
 
+    velocity = velocity;
+    isGrounded = true;
+    isFlying = false;
+    isCrouching = false;
+
     updateCameraVectors();
-  }
-
-  void processKeyboard(const char *direction, float deltaTime)
-  {
-    float velocity = speed * deltaTime;
-
-    glm::vec3 move = glm::vec3(0.0f);
-
-    if (strcmp(direction, "FORWARD") == 0)
-      move += glm::vec3(front.x, 0.0f, front.z);
-    if (strcmp(direction, "BACKWARD") == 0)
-      move -= glm::vec3(front.x, 0.0f, front.z);
-    if (strcmp(direction, "LEFT") == 0)
-      move -= right;
-    if (strcmp(direction, "RIGHT") == 0)
-      move += right;
-
-    position += glm::normalize(move) * velocity;
-
-    // Lock to ground plane
-    position.y = 1.0f;
   }
 
   glm::mat4 getViewMatrix()
   {
     return glm::lookAt(position, position + front, up);
+  }
+
+  void jump()
+  {
+    if (isGrounded && !isFlying)
+    {
+      velocity.y = jumpForce;
+      isGrounded = false;
+    }
+  }
+
+  void toggleCrouch()
+  {
+    if (!isCrouching)
+    {
+      position.y -= crouchOffset;
+      isCrouching = true;
+    }
+    else
+    {
+      position.y += crouchOffset;
+      isCrouching = false;
+    }
+  }
+
+  void toggleFly()
+  {
+    isFlying = !isFlying;
+    if (isFlying)
+    {
+      velocity.y = 0.0f; // cancel any fall
+      isGrounded = false;
+    }
+  }
+
+  void updatePhysics(float deltaTime)
+  {
+    if (!isFlying)
+    {
+      velocity.y += gravity * deltaTime;
+      position.y += velocity.y * deltaTime;
+
+      if (position.y <= standHeight)
+      {
+        position.y = standHeight;
+        velocity.y = 0.0f;
+        isGrounded = true;
+      }
+    }
   }
 
   void processMouseMovement(float xoffset, float yoffset)
@@ -89,6 +135,27 @@ public:
       pitch = -89.0f;
 
     updateCameraVectors();
+  }
+
+  void processKeyboard(const char *direction, float deltaTime)
+  {
+    float velocity = speed * deltaTime;
+
+    glm::vec3 move = glm::vec3(0.0f);
+
+    if (strcmp(direction, "FORWARD") == 0)
+      move += isFlying ? front : glm::vec3(front.x, 0.0f, front.z);
+    if (strcmp(direction, "BACKWARD") == 0)
+      move -= isFlying ? front : glm::vec3(front.x, 0.0f, front.z);
+    if (strcmp(direction, "LEFT") == 0)
+      move -= right;
+    if (strcmp(direction, "RIGHT") == 0)
+      move += right;
+
+    position += glm::normalize(move) * velocity;
+
+    // Lock to ground plane
+    // position.y = standHeight;
   }
 
 private:
